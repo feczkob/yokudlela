@@ -1,0 +1,107 @@
+@startuml
+!pragma teoz true
+autonumber
+
+actor Counter as c
+actor "Chef" as ka
+
+box Microservices
+participant Waiter as w
+participant "Kitchen + bar counter" as k
+participant Recipe as r
+participant Warehouse as wh
+end box
+
+box Infrastructure
+queue "Kitchen queue" as q
+database Database as d
+end box
+
+=== Order registration ==
+group init
+w --> q: kitchen.order
+q --> k: reading order
+note left: Orders can arrive from the\nbar counter (REST)\nor via the waiter (AMQP)
+c -> k
+end
+k -> d: saving order
+
+=== Retrieve order ==
+group init
+w -> k: order id
+note right: The counter, the chef and the waiter\ncan retrieve an order
+ka -> k
+c -> k: order id
+note right: The counter can retrieve orders\nthat were registered at the bar counter\nand the waiter can retrieve orders\n that were registered with them
+end
+k -> d: retrieving order
+k -> w
+k -> c
+
+=== Modify order ==
+group init
+w --> q: kitchen.order.modify
+q --> k
+note left: Order modification can arrive from the\nbar counter (REST)\nor via the waiter (AMQP)
+c -> k
+note right: The counter can modify orders\nthat were registered at the bar counter\nand the waiter can modify orders\nthat were registered with them
+end
+alt status is open
+k -> d: modifying order
+end
+k -> w
+k -> c
+
+=== Delete order ==
+group init
+w -> k
+note right: Order cancellation can arrive from\nthe bar counter (REST)\nor via the waiter (AMQP)
+c -> k
+note right: The counter can delete orders\nthat were registered at the bar counter\nand the waiter can delete orders\nthat were registered with them
+end
+alt status is open
+k -> d: deleting order
+end
+k -> w
+k -> c
+
+=== Modify order's status (kitchen) ==
+ka -> k: order id
+alt status is "in progress"
+k -> r: obtaining recipe
+k -> wh: obtaining ingredients
+    alt not enough ingredient in wh
+    k --> wh: notifying warehouse
+    k --> w: notifying waiter
+    end
+end
+alt status is finished
+k --> q: kitchen.finished
+end
+k -> d
+
+=== Modify order's status (bar counter) ==
+c -> k: order id
+note right: The counter can modify order status\n for orders that were registered at the bar counter
+alt status is "in progress"
+k -> r: obtaining recipe
+k -> d: obtaining ingredients
+    alt not enough ingredient in bar counter
+    k --> wh: notifying warehouse for reload
+    end
+end
+k -> d
+
+=== List orders ==
+group init
+w -> k
+note right: The counter, the chef and the\nwaiter can list orders
+ka -> k
+c -> k
+note right: The counter can list orders that were\nregistered at the bar counter\nand the waiter can list orders\nthat were registered with them
+end
+k -> d: obtaining orders
+k -> ka
+k -> c
+
+@enduml

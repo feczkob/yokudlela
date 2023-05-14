@@ -1,0 +1,79 @@
+{
+  "rabbit_version": "3.10.5",
+  "rabbitmq_version": "3.10.5",
+  "product_name": "RabbitMQ",
+  "product_version": "3.10.5",
+  "users": [
+    {
+      "name": "kitchen",
+      "password_hash": "ilbmwvwyL07KlUXQOFQNd0W2s3GxHJ9zH8KSMrUxabGw3Pyk",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": [
+        "administrator"
+      ],
+      "limits": {}
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "/"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "kitchen",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "topic_permissions": [],
+  "parameters": [],
+  "global_parameters": [
+    {
+      "name": "internal_cluster_id",
+      "value": "rabbitmq-cluster-id-fmhWK-AQ9tz9bx-sBVS9EQ"
+    }
+  ],
+  "policies": [],
+  "queues": [
+    {
+      "name": "kitchen.order.register",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic"
+      }
+    },
+    {
+      "name": "kitchen.order.modify",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic"
+      }
+    }
+  ],
+  "exchanges": [],
+  "bindings": [
+    {
+      "source": "amq.direct",
+      "vhost": "/",
+      "destination": "kitchen.order.modify",
+      "destination_type": "queue",
+      "routing_key": "kitchen",
+      "arguments": {}
+    },
+    {
+      "source": "amq.direct",
+      "vhost": "/",
+      "destination": "kitchen.order.register",
+      "destination_type": "queue",
+      "routing_key": "kitchen",
+      "arguments": {}
+    }
+  ]
+}

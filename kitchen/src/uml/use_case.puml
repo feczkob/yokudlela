@@ -1,0 +1,53 @@
+@startuml
+
+actor Counter as c
+actor Waiter as w
+actor "Chef" as ch
+
+package "Kitchen and bar counter" {
+left to right direction
+   usecase "Register order" as ro2
+   usecase go as "Retrieve order
+   ==
+   The counter can retrieve order\nthat was registered with them
+   --
+   The waiter can retrieve order\nthat was registered with them"
+   usecase mo as "Modify order
+   ==
+   The counter can modify order\nthat was registered with them
+   --
+   The waiter can modify order\nthat was registered with them"
+   usecase do as "Delete order
+   ==
+   The counter can delete order\nthat was registered with them
+   --
+   The waiter can delete order\nthat was registered with them"
+   usecase mos as "Modify order's status
+   ==
+   The counter can modify order status\nfor order that was registered with them"
+   usecase lao as "List all orders
+   ==
+   The counter can list orders\nthat were registered with them
+   --
+   The waiter can list orders\nthat were registered with them"
+}
+
+w --> ro2
+w --> go
+w --> mo
+w --> do
+w --> lao
+
+ch --> mos
+ch --> lao
+ch --> go
+
+ro2 <-- c
+go <-- c
+lao <-- c
+mo <-- c
+do <-- c
+mos <-- c
+
+
+@enduml

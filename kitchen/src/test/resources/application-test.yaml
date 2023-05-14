@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    username: kitchen
+    password: kitchen
+  jpa:
+    hibernate:
+      ddl-auto: none
+  rabbitmq:
+    username: kitchen
+    password: kitchen
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    enabled: true
+    driver-class-name: org.postgresql.Driver
+    user: ${spring.datasource.username}
+    password: ${spring.datasource.password}
+    url: ${spring.datasource.url}
+  cache:
+    redis:
+      time-to-live: 0
+
+keycloak:
+  enabled: true
+
+logging:
+  level:
+    root: error

@@ -1,0 +1,54 @@
+@startuml
+class OrderRequest {
+    + orders: List<OrderItemRequest>
+    + location_id: Int
+    + details: String
+}
+
+class OrderItemRequest {
+    + menuItemId: Int
+    + quantity: Int
+    + details: String
+}
+
+class OrderResponse {
+    + orderId: Int
+    + orders: List<OrderItemResponse>
+    + timeOfRecord: LocalDateTime
+    + timeOfModification: LocalDateTime
+    + timeOfFulfillment: LocalDateTime
+    + status: Status
+    + location_id: Int
+    + details: String
+}
+
+class OrderItemResponse {
+    + menuItemId: Int
+    + quantity: Int
+    + status: Status
+    + details: String
+}
+
+enum Status {
+    OPEN
+    IN_PROGRESS
+    FINISHED
+    PARTIALLY_FINISHED
+    FAILED
+}
+
+class LocationRequest {
+    * name: String
+    details: String
+}
+
+class LocationResponse {
+    * location_id: Int
+    --
+    * name: String
+    details: String
+}
+
+OrderRequest "1" *-- "many" OrderItemRequest
+OrderResponse "1" *-- "many" OrderItemResponse
+@enduml

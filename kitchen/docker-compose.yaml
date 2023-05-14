@@ -1,0 +1,99 @@
+version: '3.3'
+services:
+  postgres_db:
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_USER=kitchen
+      - POSTGRES_PASSWORD=kitchen
+      - POSTGRES_DB=yokudlela
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_db_vol:/var/lib/postgresql/data
+#      - ./src/main/resources/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: curl -s https://localhost:5432 >/dev/null; if [[ $$? == 52 ]]; then echo 0; else echo 1; fi
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3.10.5-management
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: kitchen
+      RABBITMQ_DEFAULT_PASS: kitchen
+    volumes:
+      - rabbit_data:/var/lib/rabbitmq/
+      - rabbit_log:/var/log/rabbitmq
+      - ./src/main/resources/rabbit/definitions.json:/etc/definitions.json:ro
+      - ./src/main/resources/rabbit/10-defaults.conf:/etc/rabbitmq/conf.d/10-defaults.conf:ro
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "5672" ]
+      interval: 5s
+      timeout: 15s
+      retries: 1
+
+  redis:
+    image: redis:latest
+    command: [ "redis-server", "--appendonly", "yes" ]
+    restart: always
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_vol:/data
+
+  kitchen:
+    image: yokudlela/kitchen
+    restart: always
+    environment:
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE: postgres_db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://172.17.0.1:5432/yokudlela
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_REDIS_HOST: redis
+      MANAGEMENT_SERVER_PORT: 9000
+    ports:
+      - "8080:8080"
+      - "5005:5005"
+    depends_on:
+      - rabbitmq
+      - postgres_db
+    links:
+      - rabbitmq
+      - postgres_db
+
+  keycloak:
+    image: jboss/keycloak
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres_db
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_SCHEMA: public
+      DB_PASSWORD: keycloak
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: yokudlela
+      KEYCLOAK_IMPORT: /tmp/example-realm.json
+      # Uncomment the line below if you want to specify JDBC parameters. The parameter below is just an example, and it shouldn't be used in production without knowledge. It is highly recommended that you read the PostgreSQL JDBC driver documentation in order to use it.
+      #JDBC_PARAMS: "ssl=true"
+    volumes:
+      - ./src/main/resources/keycloak/realm-export.json:/tmp/example-realm.json
+    ports:
+      - '6080:8080'
+    depends_on:
+      - postgres_db
+
+volumes:
+  postgres_db_vol:
+    external: false
+  rabbit_data:
+    external: false
+  rabbit_log:
+    external: false
+  redis_vol:
+    external: false

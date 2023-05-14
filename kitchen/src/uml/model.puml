@@ -1,0 +1,35 @@
+@startuml
+entity Order {
+    * order_id: number <<generated>>
+    --
+    * time_of_record: timestamp
+    time_of_modification: timestamp
+    time_of_fulfillment: timestamp
+    * status: text
+    * location_id: number <<FK>>
+    details: text
+}
+
+entity OrderItem {
+    * order_item_id: number <<generated>>
+    --
+    * order_id: number <<FK>>
+    * menu_item_id: number
+    * quantity: number
+    * time_of_record: timestamp
+    time_of_modification: timestamp
+    time_of_fulfillment: timestamp
+    * status: text
+    details: text
+}
+
+entity Location {
+    * location_id: number <<generated>>
+    --
+    * name: text
+    details: text
+}
+
+Order ||--|{ OrderItem
+Order }|--|| Location
+@enduml

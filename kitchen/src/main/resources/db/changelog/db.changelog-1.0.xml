@@ -1,0 +1,102 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <changeSet author="botond" id="1/a - Create hibernate sequence">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="hibernate_sequence"/>
+            </not>
+        </preConditions>
+        <createSequence cacheSize="1" cycle="false" dataType="bigint" incrementBy="1" maxValue="9223372036854775807"
+                        minValue="1" sequenceName="hibernate_sequence" startValue="1"/>
+    </changeSet>
+
+    <changeSet author="botond" id="1/b - Create location table">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="location"/>
+            </not>
+        </preConditions>
+        <createTable tableName="location">
+            <column name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="location_pkey"/>
+            </column>
+            <column name="details" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="botond" id="1/c - Create order_ table">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="order_"/>
+            </not>
+        </preConditions>
+        <createTable tableName="order_">
+            <column name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="order__pkey"/>
+            </column>
+            <column name="details" type="VARCHAR(255)"/>
+            <column name="location_id" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="time_of_fulfillment" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="time_of_modification" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="time_of_record" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="botond" id="1/d - Create order_item table">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="order_item"/>
+            </not>
+        </preConditions>
+        <createTable tableName="order_item">
+            <column name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="order_item_pkey"/>
+            </column>
+            <column name="details" type="VARCHAR(255)"/>
+            <column name="menu_item_id" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="order_id" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="time_of_fulfillment" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="time_of_modification" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="time_of_record" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="botond" id="1/e - Create order_item - order_ FK">
+        <addForeignKeyConstraint baseColumnNames="order_id" baseTableName="order_item"
+                                 constraintName="FK_order_item-order_" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="order_" validate="true"/>
+    </changeSet>
+
+    <changeSet author="botond" id="1/f - Create order_ - location FK">
+        <addForeignKeyConstraint baseColumnNames="location_id" baseTableName="order_"
+                                 constraintName="FK_order_-location" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="location" validate="true"/>
+    </changeSet>
+</databaseChangeLog>

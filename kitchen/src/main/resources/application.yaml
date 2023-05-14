@@ -1,0 +1,121 @@
+server:
+  port: 8080
+  servlet:
+    context-path: ""
+
+spring:
+  application:
+    name: kitchen
+  main:
+    banner-mode: off
+  jmx:
+    enabled: true
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      #      myschema: ${SPRING_JPA_PROPERTIES_MYSCHEMA:kitchen}
+      hibernate.default_schema: ${spring.jpa.properties.myschema}
+      hibernate.dialect: ${spring.jpa.database-platform}
+      hibernate.jdbc.batch_size: 20
+      hibernate.cache.use_query_cache: false
+      hibernate.cache.use_second_level_cache: false
+      hibernate.cache.use_structured_entries: false
+      hibernate.cache.use_minimal_puts: false
+      hibernate.format_sql: true
+      hibernate.check_nullability: true
+    generate-ddl: true
+    open-in-view: false
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/yokudlela}
+    username: ${SPRING_DATASOURCE_USERNAME:kitchen}
+    password: ${SPRING_DATASOURCE_PASSWORD:kitchen}
+  rabbitmq:
+    username: kitchen
+    password: kitchen
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    enabled: false
+  cache:
+    type: redis
+    redis:
+      time-to-live: 30000
+  redis:
+    port: 6379
+    host: ${SPRING_REDIS_HOST:localhost}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+  api-docs:
+    enabled: true
+    path: /api-docs
+
+keycloak:
+  enabled: false
+  auth-server-url: https://yokudlela.drhealth.cloud/auth
+  realm: yokudlela
+  resource: account
+  public-client: true
+  ssl-required: external
+  confidential-port: 0
+  use-resource-role-mappings: true
+  principal-attribute: preferred_username
+  # ! if the path ends with /{id}, then use /* in the pattern
+  security-constraints[0]:
+    auth-roles: [ kitchen-admin ]
+    security-collections[0]:
+      patterns: [ '/order/status/*','/order-item/status/*',
+                  '/order/all','/order-item/all',
+                  '/location/*', '/location' ]
+    security-collections[1]:
+      patterns: [ '/order/*', '/order-item/*' ]
+      methods: [ 'GET' ]
+  security-constraints[1]:
+    auth-roles: [ dailymenu-dish-claim-request ]
+    security-collections[0]:
+      patterns: [ '/order/*', '/order-item/*',
+                  '/order/all','/order-item/all',
+                  '/order', '/order-item' ]
+      methods: [ 'POST','GET','DELETE' ]
+    security-collections[1]:
+      patterns: [ '/order/modify/*', '/order-item/modify/*' ]
+      methods: [ 'PUT' ]
+    security-collections[2]:
+      patterns: [ '/location/*' ]
+      methods: [ 'GET' ]
+      # TODO: handle 403 (POST order with kitchen-admin e.g.)
+
+management:
+  server:
+    port: 9001
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+      group:
+        readiness:
+          enabled: true
+        liveness:
+          enabled: true
+
+amqp:
+  order:
+    register: kitchen.order.register
+    modify: kitchen.order.modify
+
+logging:
+  level:
+    org:
+      hibernate:
+        type: info
+      springframework:
+        cache: info
