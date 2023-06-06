@@ -37,7 +37,7 @@ public class CucumberTest extends BaseIntegrationTest {
 
     @Test
     public void run() {
-        io.cucumber.core.cli.Main.run(new String[]{"--glue", "hu.soft4d.integration", "classpath:features"});
+        io.cucumber.core.cli.Main.run(new String[]{"--glue", "com.yokudlela.integration", "classpath:features"});
     }
 
 }
