@@ -179,7 +179,7 @@
         </dependency>
 
         <dependency>
-            <groupId>hu.soft4d</groupId>
+            <groupId>com.yokudlela</groupId>
             <artifactId>test</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>test</scope>
