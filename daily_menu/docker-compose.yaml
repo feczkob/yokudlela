@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+
+  db:
+    image: mariadb:10.7.3
+    container_name: dailymenu_db
+    environment:
+      PROXY_ADDRESS_FORWARDING: 'true'
+      MYSQL_ROOT_PASSWORD: admin1234
+    ports:
+      - "3306:3306"
+    restart: on-failure
+    volumes:
+      - ./volumes/db/mariadb/dailymenu:/var/lib/mysql
+      # DB létrehozó szript - csak a konténer első indulásakor fut le!!!
+      - "./db/init-db/dailymenu.sql:/docker-entrypoint-initdb.d/1.sql:ro"
+    healthcheck:
+      # ÉRDEKESSÉG: $$ prefixet használunk, hogy elérjük a környezeti változókat!
+      test: [ "CMD-SHELL", "mysql --user=root --password=$$MYSQL_ROOT_PASSWORD -e 'SHOW DATABASES;' || exit 1" ]
+      interval: 60s
+      timeout: 20s
+      retries: 3
+      start_period: 30s
+
+  # ----------------------------------------------------------------------------------------------------------------------
+
+  dailymenu:
+    container_name: dailymenu
+    build:
+      context: .
+      dockerfile: src/main/docker/Dockerfile.jvm
+    environment:
+      - QUARKUS_DATASOURCE_URL=jdbc:mysql://db:3306/dailymenu?useUnicode=true&characterEncoding=UTF-8&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+      - JAVA_TOOL_OPTIONS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -DdebugHost=*"
+    expose:
+      - 5005
+    ports:
+      - "8080:8080"
+      - "5005:5005"
+    depends_on:
+      db:
+        # docker inspect --format "{{json .State.Health }}" container_id
+        condition: service_healthy
+    links:
+      - db
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+networks:
+  dailymenu:
+    driver: bridge

@@ -1,0 +1,369 @@
+<db:databaseChangeLog xmlns:db="http://www.liquibase.org/xml/ns/dbchangelog"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.2.xsd">
+
+
+    <db:changeSet id="001 - create table DISH" author="szalai_karoly">
+        <db:sql>
+            create table dish
+            (
+                id UUID NOT NULL DEFAULT ( uuid() ) PRIMARY KEY,
+                name varchar(255) not null,
+                recipe int null,
+                category varchar(255) not null check(category IN ('soup', 'main', 'dessert')),
+                price int unsigned not null DEFAULT 0,
+                active bit null,
+                constraint UK_DISH_NAME UNIQUE (name)
+            );
+        </db:sql>
+    </db:changeSet>
+
+    <db:changeSet id="002 - create table MENU" author="szalai_karoly">
+        <db:sql>
+            create table menu
+            (
+                id UUID NOT NULL DEFAULT ( uuid() ) PRIMARY KEY,
+                day date not null,
+                constraint UK_MENU_DAY UNIQUE (day)
+            );
+        </db:sql>
+    </db:changeSet>
+
+    <db:changeSet id="003 - create table ITEM" author="szalai_karoly">
+        <db:sql>
+            create table item
+            (
+                id UUID NOT NULL DEFAULT ( uuid() ) PRIMARY KEY,
+                section varchar(255) not null check(section IN ('normal', 'vegan', 'child')),
+                variant varchar(255) null,
+                menu_id UUID not null,
+                dish_id UUID not null,
+                price int unsigned not null DEFAULT 0,
+                current_amount int unsigned not null DEFAULT 0,
+                claimed_amount int unsigned not null DEFAULT 0,
+                paid_amount int unsigned not null DEFAULT 0,
+                constraint FK_ITEM_TO_MENU foreign key (menu_id) references menu (id),
+                constraint FK_ITEM_TO_DISH foreign key (dish_id) references dish (id)
+            );
+        </db:sql>
+    </db:changeSet>
+
+    <db:changeSet id="004 - fill DISH" author="szalai_karoly">
+        <db:sql>
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('soup', 'Húsleves gazdagon', 0, 600, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('soup', 'Gyümölcsleves', 0, 500, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('soup', 'Paradicsomleves', 0, 400, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('soup', 'Frankfurti leves', 0, 500, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('soup', 'Tavaszi vegyes zöldségleves', 0, 500, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('soup', 'Borsóleves', 0, 500, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('soup', 'Bableves', 0, 500, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('soup', 'Bableves füstölt csülökkel', 0, 600, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('soup', 'Krumplileves', 0, 500, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('soup', 'Babgulyás', 0, 650, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('soup', 'Tojásleves', 0, 450, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('soup', 'Lebbencsleves', 0, 450, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('soup', 'Francia hagymaleves', 0, 450, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('soup', 'Zellerkrém leves', 0, 400, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('soup', 'Sütőtökkrém leves', 0, 550, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('soup', 'Gomba leves', 0, 450, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('soup', 'Meggyleves', 0, 450, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('soup', 'Brokkoli krém leves', 0, 450, 1);
+
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('main', 'Bécsi szelet', 0, 1000, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('main', 'Gyros görögsalátával', 0, 1500, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('main', 'Gyros tzatzikivel', 0, 1500, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('main', 'Cigánypecsenye', 0, 1000, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('main', 'Marhapörkölt galuskával', 0, 1200, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('main', 'Lecsós szelet rizzsel', 0, 950, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('main', 'Mátravidéki borzaska jázmin rizzsel', 0, 1250, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('main', 'Rakott krumpli', 0, 750, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('main', 'Vegán rakott krumpli tofuval', 0, 650, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('main', 'Borsó főzelék virslivel', 0, 500, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('main', 'Borsó főzelék tócsnival', 0, 500, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('main', 'Bab főzelék füstölt tarjával', 0, 500, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('main', 'Bab főzelék füstölt zöldségfasírtttal', 0, 500, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('main', 'Tök főzelék tükörtojással', 0, 500, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('main', 'Tök főzelék virslivel', 0, 500, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('main', 'Krumpli főzelék fasírttal', 0, 500, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('main', 'Krumpli főzelék rántott hagymával', 0, 500, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('main', 'Sárgabrsó főzelék sült kolbásszal', 0, 500, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('main', 'Sárgaborsó főzelék főtt tojással', 0, 500, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('main', 'Finom főzelék rántott húsfalatokkal', 0, 750, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('main', 'Rántott csirkemell hasábburgonyával és ketchuppal', 0, 1000, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('main', 'Piskóta csokiöntettel', 0, 750, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('main', 'Tojásos nokedli fejes salátával', 0, 900, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('main', 'Tenger gyümlcsei tál', 0, 1500, 0);
+
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('dessert', 'Mákos guba', 0, 400, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('dessert', 'Somlói galuska', 0, 600, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('dessert', 'Rizs felfújt', 0, 550, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('dessert', 'Francia krémes', 0, 600, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('dessert', 'Máglyarakás', 0, 750, 1);
+            INSERT INTO dish (category, name, recipe, price, active)
+            VALUES ('dessert', 'Vegyes gyümölcshab tojás nélkül', 0, 500, 1);
+        </db:sql>
+    </db:changeSet>
+
+    <!--
+    <db:changeSet id="005 - fill MENU_ITEM" author="szalai_karoly">
+        <db:sql>
+            SET @gr_normal = 'normal';
+            SET @gr_vegan = 'vegan';
+            SET @gr_child = 'child';
+
+            SET @v_monday = STR_TO_DATE('2023-03-06', '%Y-%m-%d');
+            SET @v_tuesday = STR_TO_DATE('2023-03-07', '%Y-%m-%d');
+            SET @v_wednesday = STR_TO_DATE('2023-03-08', '%Y-%m-%d');
+            SET @v_thursday = STR_TO_DATE('2023-03-09', '%Y-%m-%d');
+            SET @v_friday = STR_TO_DATE('2023-03-10', '%Y-%m-%d');
+
+            /* MONDAY */
+
+            INSERT INTO menu (day) VALUES (@v_monday);
+            SELECT id INTO @v_monday_id FROM menu WHERE day = @v_monday;
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_monday_id, @gr_normal, 'A',
+                (SELECT id FROM dish WHERE name LIKE '%Húsleves gazdagon%' LIMIT 1), 600);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_monday_id, @gr_normal, 'B',
+                (SELECT id FROM dish WHERE name LIKE 'Gyümölcsleves' LIMIT 1), 600);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_monday_id, @gr_normal, 'A',
+                (SELECT id FROM dish WHERE name LIKE 'Bécsi szelet' LIMIT 1), 1000);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_monday_id, @gr_normal, 'B',
+                (SELECT id FROM dish WHERE name LIKE 'Lecsós szelet rizzsel' LIMIT 1), 1000);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_monday_id, @gr_vegan, 'A',
+                (SELECT id FROM dish WHERE name LIKE 'Krumplileves' LIMIT 1), 500);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_monday_id, @gr_vegan, 'B',
+                (SELECT id FROM dish WHERE name LIKE 'Vegán rakott krumpli tofuval' LIMIT 1), 700);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_monday_id, @gr_child, 'A',
+                (SELECT id FROM dish WHERE name LIKE 'Krumplileves' LIMIT 1), 500);
+
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_monday_id, @gr_child, 'A',
+                (SELECT id FROM dish WHERE name LIKE 'Finom%' LIMIT 1), 750);
+
+            /* TUESDAY */
+
+            INSERT INTO menu (day) VALUES (@v_tuesday);
+            SELECT id INTO @v_tuesday_id FROM menu WHERE day = @v_tuesday;
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_tuesday_id, @gr_normal, 'A',
+                    (SELECT id FROM dish WHERE name LIKE '%Tavaszi vegyes zöldségleves%' LIMIT 1), 500);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_tuesday_id, @gr_normal, 'B',
+                    (SELECT id FROM dish WHERE name LIKE 'Borsóleves' LIMIT 1), 500);
+
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_tuesday_id, @gr_normal, 'A',
+                    (SELECT id FROM dish WHERE name LIKE 'Borsó főzelék virslivel' LIMIT 1), 650);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_tuesday_id, @gr_normal, 'B',
+                    (SELECT id FROM dish WHERE name LIKE 'Borsó főzelék tócs%' LIMIT 1), 550);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_tuesday_id, @gr_vegan, 'A',
+                    (SELECT id FROM dish WHERE name LIKE '%Tavaszi vegyes zöldségleves%' LIMIT 1), 500);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_tuesday_id, @gr_vegan, 'B',
+                    (SELECT id FROM dish WHERE name LIKE 'Borsó főzelék tócs%' LIMIT 1), 550);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_tuesday_id, @gr_child, 'A',
+                    (SELECT id FROM dish WHERE name LIKE 'Borsóleves' LIMIT 1), 500);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_tuesday_id, @gr_child, 'A',
+                    (SELECT id FROM dish WHERE name LIKE 'Borsó főzelék tócs%' LIMIT 1), 550);
+
+            /* WEDNESDAY */
+
+            INSERT INTO menu (day) VALUES (@v_wednesday);
+            SELECT id INTO @v_wednesday_id FROM menu WHERE day = @v_wednesday;
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_wednesday_id, @gr_normal, 'A',
+                    (SELECT id FROM dish WHERE name LIKE 'Tojásleves' LIMIT 1), 450);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_wednesday_id, @gr_normal, 'B',
+                    (SELECT id FROM dish WHERE name LIKE '%agyma%leves%' LIMIT 1), 450);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_wednesday_id, @gr_normal, 'A',
+                    (SELECT id FROM dish WHERE name LIKE '%Marhapörkölt%' LIMIT 1), 1200);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_wednesday_id, @gr_normal, 'B',
+                    (SELECT id FROM dish WHERE name LIKE 'Cigánypecsenye' LIMIT 1), 1000);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_wednesday_id, @gr_vegan, 'A',
+                    (SELECT id FROM dish WHERE name LIKE '%agyma%leves%' LIMIT 1), 450);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_wednesday_id, @gr_vegan, 'A',
+                    (SELECT id FROM dish WHERE name LIKE 'Bab főzelék füstölt zöldségfasírtttal' LIMIT 1), 650);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_wednesday_id, @gr_child, 'A',
+                    (SELECT id FROM dish WHERE name LIKE 'Tojásleves' LIMIT 1), 450);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_wednesday_id, @gr_child, 'A',
+                    (SELECT id FROM dish WHERE name LIKE 'Bab főzelék füstölt zöldségfasírtttal' LIMIT 1), 650);
+
+            /* THURSDAY */
+
+            INSERT INTO menu (day) VALUES (@v_thursday);
+            SELECT id INTO @v_thursday_id FROM menu WHERE day = @v_thursday;
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_thursday_id, @gr_normal, 'A',
+                    (SELECT id FROM dish WHERE name LIKE 'Paradicsomleves' LIMIT 1), 450);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_thursday_id, @gr_normal, 'B',
+                    (SELECT id FROM dish WHERE name LIKE '%Frankfurti%' LIMIT 1), 500);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_thursday_id, @gr_normal, 'A',
+                    (SELECT id FROM dish WHERE name LIKE '%borzaska%' LIMIT 1), 1200);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_thursday_id, @gr_normal, 'B',
+                    (SELECT id FROM dish WHERE name LIKE 'Tök főzelék tükörtojással' LIMIT 1), 500);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_thursday_id, @gr_vegan, 'A',
+                    (SELECT id FROM dish WHERE name LIKE 'Paradicsomleves' LIMIT 1), 450);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_thursday_id, @gr_vegan, 'B',
+                    (SELECT id FROM dish WHERE name LIKE 'Tök főzelék tükörtojással' LIMIT 1), 500);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_thursday_id, @gr_child, 'A',
+                    (SELECT id FROM dish WHERE name LIKE 'Paradicsomleves' LIMIT 1), 450);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_thursday_id, @gr_child, 'A',
+                    (SELECT id FROM dish WHERE name LIKE '%borzaska%' LIMIT 1), 1200);
+
+            /* FRIDAY */
+
+            INSERT INTO menu (day) VALUES (@v_friday);
+            SELECT id INTO @v_friday_id FROM menu WHERE day = @v_friday;
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_friday_id, @gr_normal, 'A',
+                    (SELECT id FROM dish WHERE name LIKE '%omba%' LIMIT 1), 450);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_friday_id, @gr_normal, 'B',
+                    (SELECT id FROM dish WHERE name LIKE 'Bableves füstölt csülökkel' LIMIT 1), 650);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_friday_id, @gr_normal, 'A',
+                    (SELECT id FROM dish WHERE name LIKE 'Rántott csirkemell hasábburgonyával és ketchuppal' LIMIT 1), 1000);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_friday_id, @gr_normal, 'B',
+                    (SELECT id FROM dish WHERE name LIKE 'Tojásos nokedli fejes salátával' LIMIT 1), 1000);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_friday_id, @gr_normal, 'A',
+                    (SELECT id FROM dish WHERE name LIKE 'Piskóta csokiöntettel' LIMIT 1), 500);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_friday_id, @gr_normal, 'B',
+                    (SELECT id FROM dish WHERE name LIKE '%krémes%' LIMIT 1), 500);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_friday_id, @gr_vegan, 'A',
+                    (SELECT id FROM dish WHERE name LIKE '%omba%' LIMIT 1), 450);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_friday_id, @gr_vegan, 'B',
+                    (SELECT id FROM dish WHERE name LIKE '%rokkoli%leves%' LIMIT 1), 450);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_friday_id, @gr_vegan, 'A',
+                    (SELECT id FROM dish WHERE name LIKE 'Piskóta csokiöntettel' LIMIT 1), 500);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_friday_id, @gr_child, 'A',
+                    (SELECT id FROM dish WHERE name LIKE '%omba%' LIMIT 1), 450);
+
+            INSERT INTO item (menu_id, section, variant, dish_id, price)
+            VALUES (@v_friday_id, @gr_child, 'A',
+                    (SELECT id FROM dish WHERE name LIKE 'Piskóta csokiöntettel' LIMIT 1), 500);
+
+        </db:sql>
+    </db:changeSet>
+    -->
+</db:databaseChangeLog>
